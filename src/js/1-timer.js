@@ -4,11 +4,12 @@ import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 
 const startButton = document.querySelector('button[data-start]');
+startButton.addEventListener('click', startTimer);
 
 startButtonEnabeld(startButton, false);
 
 let userSelectedDate = '';
-const currentDate = new Date();
+let currentDate = '';
 
 flatpickr('#datetime-picker', {
   enableTime: true,
@@ -17,15 +18,14 @@ flatpickr('#datetime-picker', {
   minuteIncrement: 1,
   onClose(selectedDates) {
     userSelectedDate = new Date(selectedDates[0]);
+    currentDate = new Date();
     if (userSelectedDate <= currentDate) {
       iziToast.error({
         message: 'Please choose a date in the future',
         timeout: 2000,
-        color: 'red',
         position: 'topRight',
         transitionIn: 'fadeInDown',
         progressBar: false,
-        icon: 'material-icons',
       });
       startButtonEnabeld(startButton, false);
     } else {
@@ -40,4 +40,36 @@ function startButtonEnabeld(startButton, condition = false) {
   } else {
     startButton.removeAttribute('disabled');
   }
+}
+
+function convertMs(ms) {
+  // Number of milliseconds per unit of time
+  const second = 1000;
+  const minute = second * 60;
+  const hour = minute * 60;
+  const day = hour * 24;
+
+  // Remaining days
+  const days = Math.floor(ms / day);
+  // Remaining hours
+  const hours = Math.floor((ms % day) / hour);
+  // Remaining minutes
+  const minutes = Math.floor(((ms % day) % hour) / minute);
+  // Remaining seconds
+  const seconds = Math.floor((((ms % day) % hour) % minute) / second);
+
+  return { days, hours, minutes, seconds };
+}
+
+function addLeadingZero(timeToFormat) {
+  for (key in timeToFormat) {
+    timeToFormat.le;
+  }
+}
+
+function startTimer() {
+  const timeToCountdown = convertMs(
+    userSelectedDate.getTime() - currentDate.getTime()
+  );
+  console.log(timeToCountdown);
 }
