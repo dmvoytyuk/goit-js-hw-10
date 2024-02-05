@@ -9,7 +9,6 @@ startButton.addEventListener('click', startTimer);
 startButtonEnabeld(startButton, false);
 
 let userSelectedDate = '';
-let currentDate = '';
 
 flatpickr('#datetime-picker', {
   enableTime: true,
@@ -18,7 +17,7 @@ flatpickr('#datetime-picker', {
   minuteIncrement: 1,
   onClose(selectedDates) {
     userSelectedDate = new Date(selectedDates[0]);
-    currentDate = new Date();
+    const currentDate = new Date();
     if (userSelectedDate <= currentDate) {
       iziToast.error({
         message: 'Please choose a date in the future',
@@ -62,14 +61,22 @@ function convertMs(ms) {
 }
 
 function addLeadingZero(timeToFormat) {
-  for (key in timeToFormat) {
-    timeToFormat.le;
+  let formattedTimer = {};
+  for (const key in timeToFormat) {
+    if (timeToFormat[key] < 10) {
+      formattedTimer[key] = timeToFormat[key].toString().padStart(2, 0);
+    } else {
+      formattedTimer[key] = timeToFormat[key].toString();
+    }
   }
+  return formattedTimer;
 }
 
 function startTimer() {
+  currentDate = new Date();
   const timeToCountdown = convertMs(
     userSelectedDate.getTime() - currentDate.getTime()
   );
-  console.log(timeToCountdown);
+  const formattedTimer = addLeadingZero(timeToCountdown);
+  console.log(formattedTimer);
 }
