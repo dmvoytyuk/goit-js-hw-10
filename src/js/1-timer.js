@@ -4,40 +4,29 @@ import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 
 const startButton = document.querySelector('button[data-start]');
-startButton.addEventListener('click', startTimer);
+const datePicker = document.querySelector('#datetime-picker');
 
-startButtonEnabeld(startButton, false);
-
+const timerContainer = {
+  seconds: document.querySelector('span[data-seconds]'),
+  minutes: document.querySelector('span[data-minutes]'),
+  hours: document.querySelector('span[data-hours]'),
+  days: document.querySelector('span[data-days]'),
+};
 let userSelectedDate = '';
-
-flatpickr('#datetime-picker', {
-  enableTime: true,
-  time_24hr: true,
-  defaultDate: new Date(),
-  minuteIncrement: 1,
-  onClose(selectedDates) {
-    userSelectedDate = new Date(selectedDates[0]);
-    const currentDate = new Date();
-    if (userSelectedDate <= currentDate) {
-      iziToast.error({
-        message: 'Please choose a date in the future',
-        timeout: 2000,
-        position: 'topRight',
-        transitionIn: 'fadeInDown',
-        progressBar: false,
-      });
-      startButtonEnabeld(startButton, false);
-    } else {
-      startButtonEnabeld(startButton, true);
-    }
-  },
-});
 
 function startButtonEnabeld(startButton, condition = false) {
   if (condition === false) {
     startButton.setAttribute('disabled', 'true');
   } else {
     startButton.removeAttribute('disabled');
+  }
+}
+
+function datePickerEnabled(datePicker, condition = true) {
+  if (condition === false) {
+    datePicker.setAttribute('disabled', 'true');
+  } else {
+    datePicker.removeAttribute('disabled');
   }
 }
 
@@ -72,11 +61,52 @@ function addLeadingZero(timeToFormat) {
   return formattedTimer;
 }
 
-function startTimer() {
-  currentDate = new Date();
-  const timeToCountdown = convertMs(
-    userSelectedDate.getTime() - currentDate.getTime()
-  );
-  const formattedTimer = addLeadingZero(timeToCountdown);
-  console.log(formattedTimer);
+function renderTimer(formattedTimer, timerContainer) {
+  for (const key in formattedTimer) {
+    timerContainer[key].textContent = formattedTimer[key];
+  }
 }
+
+function startTimer() {
+  startButtonEnabeld(startButton, false);
+  datePickerEnabled(datePicker, false);
+  const timerId = setInterval(() => {
+    const currentDate = new Date();
+    if (userSelectedDate.getTime() - currentDate.getTime() < 0) {
+      clearInterval(timerId);
+    } else {
+      const timeToCountdown = convertMs(
+        userSelectedDate.getTime() - currentDate.getTime()
+      );
+      const formattedTimer = addLeadingZero(timeToCountdown);
+      renderTimer(formattedTimer, timerContainer);
+    }
+  }, 1000);
+}
+
+datePickerEnabled(datePicker, true);
+startButtonEnabeld(startButton, false);
+startButton.addEventListener('click', startTimer);
+
+flatpickr('#datetime-picker', {
+  enableTime: true,
+  time_24hr: true,
+  defaultDate: new Date(),
+  minuteIncrement: 1,
+  onClose(selectedDates) {
+    userSelectedDate = new Date(selectedDates[0]);
+    const currentDate = new Date();
+    if (userSelectedDate <= currentDate) {
+      iziToast.error({
+        message: 'Please choose a date in the future',
+        timeout: 2000,
+        position: 'topRight',
+        transitionIn: 'fadeInDown',
+        progressBar: false,
+      });
+      startButtonEnabeld(startButton, false);
+    } else {
+      startButtonEnabeld(startButton, true);
+    }
+  },
+});
