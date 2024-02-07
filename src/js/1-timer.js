@@ -101,7 +101,7 @@ flatpickr('#datetime-picker', {
         message: 'Please choose a date in the future',
         timeout: 2000,
         position: 'topRight',
-        transitionIn: 'fadeInDown',
+        transitionIn: 'fadeIn',
         progressBar: false,
       });
       startButtonEnabeld(startButton, false);
